@@ -537,9 +537,11 @@
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     ~~~
 
-2) To use the SMTP server for gmail, add the following with a valid gmail account
+2) To use the SMTP server for `gmail`, add the following with a valid `gmail` account
+   
     - IMPORTANT !! You can hide this info from tracking this sensitive info in github by going into the directory and issuing the following command to halt tracking changes on settings.py
     - TLS is a cryptographic protocol that provides end-to-end security of data sent between applications over the Internet.
+    - 
         ~~~ bash
         git update-index --assume-unchanged settings.py
         ~~~
@@ -597,7 +599,7 @@
                 return render(request, 'blog/post/share.html', context)  
             ~~~
 
-1) Add the path in `/blogs/urls.py`    
+4) Add the path in `/blogs/urls.py`    
 
     ~~~ py
     urlpatterns = [
@@ -609,7 +611,7 @@
     ]
     ~~~
 
-2) Create the `share` template inside `blog/post`
+5) Create the `share` template inside `blog/post`
 
     ~~~ html
     {% extends "blog/base.html" %}
@@ -618,9 +620,9 @@
 
     {% block content %}
         {% if sent %}
-            <h1> E-mail succesfully sent </h1>
+            <h1> E-mail successfully sent </h1>
             <p> 
-                "{{ post.title}}" was succesfully sent to {{ form.cleaned_data.to}}.
+                "{{ post.title}}" was successfully sent to {{ form.cleaned_data.to}}.
             </p>
         {% else %}
             <h1> Share "{{ post.title }}" by e-mail </h1>
@@ -1030,4 +1032,29 @@
             </p>
         ...
     ~~~
+
+#### Using custom tempalte tags
+
+1) Create a `templatetags` directory inside the `blog` app
+
+2) Add the following two files to the `templatetags` directory
+
+   - `__init__.py`
+
+   - `blog_tags.py`
+
+3) Add the following to the `blog_tags` file
+
+    ~~~ py
+    from django import template
+    from ..models import Post
+
+    register = template.Library()
+
+    @register.simple_tag
+    def total_posts():
+        return Post.published.count
+
+    ~~~
+
 
