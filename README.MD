@@ -1045,6 +1045,10 @@
 
 3) Add the following to the `blog_tags` file
 
+
+- `Django` uses the `simple_tag` decorator to use the function name as the tag name. To create a custom name, append `(name='CustomName')` to `.simple_tag`
+- the `register` variable is an instance of `template.Library()` and it regsiters the custom tags and filters
+
     ~~~ py
     from django import template
     from ..models import Post
@@ -1057,4 +1061,33 @@
 
     ~~~
 
+4) Update `base.html` to utilize `blog_tags`
+
+    ~~~ html
+    {% load blog_tags %}
+    {% load static %}
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>{% block title %} {% endblock %} </title>
+            <link href = "{% static "css/blog.css"%}" rel = "stylesheet">
+        </head>
+
+        <body>
+
+            <div id = "content">
+                {% block content %}
+
+                {% endblock %}
+            </div>
+
+            <div id = "sidebar">
+                <h2> My blog </h2>
+                <p> This is my blog, I've wriiten {% total_posts %} so far </p>
+            </div>
+
+        </body>
+
+    </html>
+    ~~~
 
