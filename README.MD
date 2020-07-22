@@ -1207,3 +1207,80 @@
      - the sidebar will now show all of the custom template tags
 
      <img src = "side_bar_with_several_custom_template_tags.png" width = "50%"/>
+
+#### Custom template filters
+
+     - Special Python functions that accept 1 or 2 parameters and an optional argument
+     - Value returned can be sent into a another filter
+
+1) `Markdown` syntax can be converted to HTML in templates after installing the Python markdown module
+
+     <a href = "https://python-markdown.github.io/" > Python Markdown </a>
+
+     <a href = "https://docs.djangoproject.com/en/3.0/ref/templates/builtins/#built-in-filter-reference"> Django filter reference </a>
+
+     <a href = "https://docs.djangoproject.com/en/3.0/howto/custom-template-tags/#writing-custom-template-filters"> Django custom template filter reference </a>
+
+
+     - install `markdown` within the `virtual environment`
+
+     ~~~ bash
+     pip install markdown
+     ~~~
+
+2) Create a custom filter to use Markdown in blog posts and then convert to HTML in templates in `blog_tags.py`
+
+     - by default, `Django` will escape HTML code to prevent malicious HTML output
+     - using the `mark_safe` function will allow Djngo to output the HTML
+     - the function is named to prevent conflicts
+
+     - import the following
+
+     ~~~ py
+     from django.utils.safestring import mark_safe
+     import markdown
+     ~~~
+
+
+     ~~~ py
+     @register.filter(name = "markdown")
+     def markdown_format(text):
+          return mark_safe(markdown.markdown(text))
+     ~~~
+
+ 1) Add the following to load template tags in `list.html` & `detail.html` below the `extends tag`
+
+     ~~~ html
+     {% load blog_tags %}
+     ~~~
+
+3) In `details.html` 
+
+     replace `{{post.body|linebreaks}}`
+
+     with `{{post.body|markdown}}`
+
+4) In `list.html` 
+   
+     replace `{{ post.body|truncatewords:30|linebreaks}}`
+     
+     with ` {{ post.body|markdown|truncatewords_html:30 }}`
+
+5) Open the URL to `http://127.0.0.1:8000/admin/blog/post/add/` and the following to the body section
+
+     ~~~ text
+     This is a post formatted with markdown
+     --------------------------------------
+
+     *this is emphasized*  **this is more emphasized**
+
+     Here is a new list:
+     * one
+     * two
+     * three
+     ~~~
+
+     - the following should will be rendered on the blog site
+
+     <img src = "markdown_post.png" width = "50%"/>
+
