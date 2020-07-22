@@ -1157,3 +1157,53 @@
                {% time %}          
           </div>
      ~~~
+
+
+8) Add a `simple tag` that returns a reusable value in `django_blog_postgres`
+
+     - a `QuerySet` using the `annotate` function will aggregate the total number of post comments
+     - the `Count` function will store the total number in the `total_comments` variable
+     - the `-` sign puts the results in descending order
+     - the `count` variable is optional and limits the total objects returned to 5
+
+
+     - make sure that `Count` is imported
+
+     ~~~ py
+     from django.db.models import Count
+     ~~~
+
+     ~~~ py
+     @register.simple_tag
+     def get_most_commented_posts(count = 5):
+          return Post.published.annotate(total_comments = Count('comments')).order_by('-total_comments')[:count]   
+     ~~~
+
+9) Update the `base.html` template
+
+     - the variable returned is stored in a new variabled called `most_commented_posts`
+
+     ~~~ html
+          <div id = "sidebar">
+               <h2> My blog </h2>
+               <p> This is my blog, I've wriiten {% total_posts %} so far </p>
+          
+               <h3> Latest posts </h3>
+               {% show_latest_posts 3 %}
+               <h4> Current time </h4>
+               {% time %}
+               <h3> Most commented posts </h3>
+               {% get_most_commented_posts as most_commented_posts %}
+               <ul>
+                    {% for post in most_commented_posts %}
+                         <li>
+                              <a href = "{{post.get_absolute_url}}"> {{post.title}} </a>
+                         </li>
+                    {% endfor %}     
+               </ul>
+          </div>
+     ~~~
+
+     - the sidebar will now show all of the custom template tags
+
+     <img src = "side_bar_with_several_custom_template_tags.png" width = "50%"/>
