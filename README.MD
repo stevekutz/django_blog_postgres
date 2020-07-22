@@ -497,7 +497,7 @@
 1) Create a `forms.py` file inside the blog app
 
     - this subclassess the base Form class
-    - the CharField typcially renders as a HTML `input` element
+    - the CharField typicially renders as a HTML `input` element
     - `widget = forms.Textarea` overrides this and renders as an HTML `textarea` element
     - email validation is done on anything with `EmailField()`
     - <a href = 'https://docs.djangoproject.com/en/3.0/ref/forms/fields/'> Django Form Fields documentation </a>
@@ -527,7 +527,7 @@
     - the same view is used for initial blank forms as well as forms with submitted data
     - a `GET` request indicates an empty form has to be displayed
     - a `POST` request indicates that valid form data has been submitted for the form to process
-    - `request.method = POST` distinguishes between these twp scenarios
+    - `request.method = POST` distinguishes between these two scenarios
 
 #### Sending emails with Django
 
@@ -760,7 +760,7 @@
         ~~~
 
 7) Add comments to `post_detail` template content block
-* 
+
     ~~~ py
         {% with comments.count as total_comments %}
             <h2>
@@ -1033,7 +1033,9 @@
         ...
     ~~~
 
-#### Using custom tempalte tags
+#### Using custom template tags
+
+<a href = "https://docs.djangoproject.com/en/3.0/howto/custom-template-tags/"> Django Cusomter template tags documentation </a>
 
 1) Create a `templatetags` directory inside the `blog` app
 
@@ -1091,3 +1093,67 @@
     </html>
     ~~~
 
+   - The `blog` page will now show the `total_posts` custom tag
+
+    <img src = "total_posts_custom_tag.png" width = "50%"/>
+
+5) Add the following to `blog_tags.py`
+
+     - show current_time is just used to demonstrate anther way to use a simple_tag that is named `time`
+
+     ~~~ py
+     import datetime
+
+     register = template.Library()
+
+     format_string = "%b %x %X %Z %p"
+
+     @register.simple_tag
+     def total_posts():
+     return Post.published.count()
+
+     @register.simple_tag(name = 'time')
+     def show_current_time():
+          return datetime.datetime.now().strftime(format_string)
+     ~~~
+
+     - the inclusion tag allows rendering of context variables into a template
+     - the `blog/post/latest_posts.html` template renders the `latest_posts` context variable
+     - this function returns a `dictionary`
+
+     ~~~ py
+     @register.inclusion_tag('blog/post/latest_posts.html')
+     def show_latest_posts(count=5):
+     latest_posts = Post.published.order_by('-publish')[:count]
+     return {'latest_posts': latest_posts}
+     ~~~
+
+6) Create the `blog/post/latest_posts.html` template
+
+     - the URL & title of each item in the `latest_posts` dictionary is rendered in the template
+
+     ~~~ html
+     <ul>
+          {% for post in latest_posts %}
+               <li>
+                    <a href = "{{ post.get_absolute.url }}"> {{ post.title }} </a>
+               </li>
+          {% endfor%}
+     </ul>
+     ~~~
+
+7) Modify `base.html` to render the `context variable`
+
+     - 
+
+     ~~~ html
+          <div id = "sidebar">
+               <h2> My blog </h2>
+               <p> This is my blog, I've wriiten {% total_posts %} so far </p>
+          
+               <h3> Latest posts </h3>
+               {% show_latest_posts 3 %}
+               <h4> Current time </h4>
+               {% time %}          
+          </div>
+     ~~~
