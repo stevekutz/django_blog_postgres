@@ -1210,10 +1210,10 @@
 
 #### Custom template filters
 
+1) `Markdown` syntax can be converted to HTML in templates after installing the Python markdown module
+   
      - Special Python functions that accept 1 or 2 parameters and an optional argument
      - Value returned can be sent into a another filter
-
-1) `Markdown` syntax can be converted to HTML in templates after installing the Python markdown module
 
      <a href = "https://python-markdown.github.io/" > Python Markdown </a>
 
@@ -1248,25 +1248,25 @@
           return mark_safe(markdown.markdown(text))
      ~~~
 
- 1) Add the following to load template tags in `list.html` & `detail.html` below the `extends tag`
+ 3) Add the following to load template tags in `list.html` & `detail.html` below the `extends tag`
 
      ~~~ html
      {% load blog_tags %}
      ~~~
 
-3) In `details.html` 
+4) In `details.html` 
 
      replace `{{post.body|linebreaks}}`
 
      with `{{post.body|markdown}}`
 
-4) In `list.html` 
+5) In `list.html` 
    
      replace `{{ post.body|truncatewords:30|linebreaks}}`
      
      with ` {{ post.body|markdown|truncatewords_html:30 }}`
 
-5) Open the URL to `http://127.0.0.1:8000/admin/blog/post/add/` and the following to the body section
+6) Open the URL to `http://127.0.0.1:8000/admin/blog/post/add/` and the following to the body section
 
      ~~~ text
      This is a post formatted with markdown
@@ -1284,3 +1284,50 @@
 
      <img src = "markdown_post.png" width = "50%"/>
 
+#### Creating a sitemap
+
+1) Add the following to `settings.py` and define a `site ID`
+
+     - `Django` includes a `sitemap framework` that provides search engines
+          - pages of your website
+          - relevance
+          - update frequency
+     - it also associates objects to specific websites running within the project
+     - using the `sitemap framework` requires activation of the sites and the sitmap applications
+
+     ~~~ py
+     # Application definition
+
+     SITE_ID = 1
+
+     INSTALLED_APPS = [
+     'blog.apps.BlogConfig',
+     'taggit',
+     'django.contrib.admin',
+     'django.contrib.auth',
+     'django.contrib.contenttypes',
+     'django.contrib.sessions',
+     'django.contrib.messages',
+     'django.contrib.staticfiles',
+     'django.contrib.sites',
+     'django.contrib.sitemaps',
+
+     ]
+     ~~~
+
+2) Create tables for the `Django` site application by runnning a migration in the terminal of the virtual environment
+
+     ~~~bash 
+     python manage.py migrate
+     ~~~
+
+
+     - the following is expected in the terminal
+
+     ~~~ bash
+     Operations to perform:
+     Apply all migrations: admin, auth, blog, contenttypes, sessions, sites, taggit
+     Running migrations:
+     Applying sites.0001_initial... OK
+     Applying sites.0002_alter_domain_unique... OK
+     ~~~
