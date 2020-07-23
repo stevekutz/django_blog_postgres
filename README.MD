@@ -1331,3 +1331,159 @@
      Applying sites.0001_initial... OK
      Applying sites.0002_alter_domain_unique... OK
      ~~~
+
+
+3) Create the `sitemps.py` file inside the `blog` folder
+
+     - a `sitemap` is an `XML` file that provides info to `search engines`
+     - the custom sitemap inherits from the `Sitemap` class
+     - `relevance` is determined from the `priority` attribute
+     - `update frequency` is determined from the `changefreq` attribute
+     - `items` returns a `QuerySet` of objects used in the sitemap
+     - `absolute_URL` determines the `URL` of each post
+     - `location` can be used to find the `URL` of each object
+     - `lastmod` provides the most recent update timestamp
+     - NOTE: `changefreq` & `priority` can be used as `attributes` OR `methods`
+     - <a href = "https://docs.djangoproject.com/en/3.0/ref/contrib/sitemaps/"> Django SiteMap framework </a>
+
+
+     ~~~ py
+     from django.contrib.sitemaps import Sitemap
+     from .models import Post
+
+     class PostSitemap(Sitemap):
+          changefreq = 'weekly'
+          priority = '0.9'    # max is 1
+
+          # Django will call the get_abolsute_url method created in Post model
+          #    def get_absolute_url(self):
+          def items(self):
+               return Post.published.all()
+
+
+          # should return a datetime obj
+          # defined in Post model as
+          #    updated = models.DateTimeField(auto_now=True)
+          def lastmod(self, obj):
+               return obj.updated 
+     ~~~
+
+
+4) Add `sitemap URL` to the project's `urls.py` file
+
+     - the following imports are required
+
+     ~~~ py
+     from django.contrib.sitemaps.views import sitemap
+     from blog.sitemaps import PostSitemap
+     ~~~
+
+     - NOTE: changes to a sitemap can `ping` Google 
+     - <a href = "https://docs.djangoproject.com/en/3.0/ref/contrib/sitemaps/#django.contrib.sitemaps.ping_google"> Ping Google </a>
+
+     ~~~ py
+     # a custom sitemaps dictionary can be created and passed to the sitemap view
+     sitemaps = {
+          'posts': PostSitemap,
+     }
+
+
+     urlpatterns = [
+          path('admin/', admin.site.urls),
+          path('blog/', include('blog.urls', namespace = 'blog')),
+          path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name = 'django.contrib.sitemaps.views.sitemap')
+     ]
+     ~~~
+
+5) Open `http://127.0.0.1:8000/sitemap.xml`  in the browser to view the XML output of `sitemap.xml`
+
+     - each `url` tag is creaated using info returned from the `get_absolute_url` method in the `Post` model
+     - the site is defined as `example.com` as defined in the `Site` obj in the database
+
+     ~~~ xml
+     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+          <url>
+               <loc>http://example.com/blog/2020/7/22/markdown-post/</loc>
+               <lastmod>2020-07-22</lastmod>
+               <changefreq>weekly</changefreq>
+               <priority>0.9</priority>
+          </url>
+          <url>
+               <loc>http://example.com/blog/2020/5/22/new-published-post/</loc>
+               <lastmod>2020-05-22</lastmod>
+               <changefreq>weekly</changefreq>
+               <priority>0.9</priority>
+          </url>
+          <url>
+               <loc>http://example.com/blog/2020/5/22/miles-davis-favorite-songs/</loc>
+               <lastmod>2020-05-27</lastmod>
+               <changefreq>weekly</changefreq>
+               <priority>0.9</priority>
+          </url>
+          <url>
+               <loc>http://example.com/blog/2020/5/22/notes-duke-ellington/</loc>
+               <lastmod>2020-05-27</lastmod>
+               <changefreq>weekly</changefreq>
+               <priority>0.9</priority>
+          </url>
+               <url>
+               <loc>http://example.com/blog/2020/5/20/another-post/</loc>
+               <lastmod>2020-05-20</lastmod>
+               <changefreq>weekly</changefreq>
+               <priority>0.9</priority>
+          </url>
+               <url>
+               <loc>http://example.com/blog/2020/5/20/Who-was-Django-Reinhardt/</loc>
+               <lastmod>2020-05-27</lastmod>
+               <changefreq>weekly</changefreq>
+               <priority>0.9</priority>
+          </url>
+     </urlset>
+     ~~~
+
+6) Open `http://127.0.0.1:8000/admin/sites/site/` to see the admin view of the site's framework
+
+     <img src = "admin_sitemap.png" width = "50%"/>
+
+7) Change the `Domain name` to `localhost:8000` and note that the url location is now updated
+
+     ~~~ xml
+     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+          <url>
+               <loc>http://localhost:8000/blog/2020/7/22/markdown-post/</loc>
+               <lastmod>2020-07-22</lastmod>
+               <changefreq>weekly</changefreq>
+               <priority>0.9</priority>
+          </url>
+          <url>
+               <loc>http://localhost:8000/blog/2020/5/22/new-published-post/</loc>
+               <lastmod>2020-05-22</lastmod>
+               <changefreq>weekly</changefreq>
+               <priority>0.9</priority>
+          </url>
+          <url>
+               <loc>http://localhost:8000/blog/2020/5/22/miles-davis-favorite-songs/</loc>
+               <lastmod>2020-05-27</lastmod>
+               <changefreq>weekly</changefreq>
+               <priority>0.9</priority>
+          </url>
+          <url>
+               <loc>http://localhost:8000/blog/2020/5/22/notes-duke-ellington/</loc>
+               <lastmod>2020-05-27</lastmod>
+               <changefreq>weekly</changefreq>
+               <priority>0.9</priority>
+          </url>
+          <url>
+               <loc>http://localhost:8000/blog/2020/5/20/another-post/</loc>
+               <lastmod>2020-05-20</lastmod>
+               <changefreq>weekly</changefreq>
+               <priority>0.9</priority>
+          </url>
+          <url>
+               <loc>http://localhost:8000/blog/2020/5/20/Who-was-Django-Reinhardt/</loc>
+               <lastmod>2020-05-27</lastmod>
+               <changefreq>weekly</changefreq>
+               <priority>0.9</priority>
+          </url>
+     </urlset>
+     ~~~

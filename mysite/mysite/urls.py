@@ -16,8 +16,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('blog/', include('blog.urls', namespace = 'blog')),
+from django.contrib.sitemaps.views import sitemap
+from blog.sitemaps import PostSitemap
 
+
+# a custom sitemaps dictionary can be created and passed to the sitemap view
+sitemaps = {
+     'posts': PostSitemap,
+}
+
+
+urlpatterns = [
+     path('admin/', admin.site.urls),
+     path('blog/', include('blog.urls', namespace = 'blog')),
+     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name = 'django.contrib.sitemaps.views.sitemap')
 ]
