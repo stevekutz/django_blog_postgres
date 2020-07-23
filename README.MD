@@ -1099,7 +1099,7 @@
 
 5) Add the following to `blog_tags.py`
 
-     - show current_time is just used to demonstrate anther way to use a simple_tag that is named `time`
+     - show current_time is just used to demonstrate anther way to use a simple_tag that is named `time_now`
 
      ~~~ py
      import datetime
@@ -1112,7 +1112,7 @@
      def total_posts():
      return Post.published.count()
 
-     @register.simple_tag(name = 'time')
+     @register.simple_tag(name = 'time_now')
      def show_current_time():
           return datetime.datetime.now().strftime(format_string)
      ~~~
@@ -1154,7 +1154,7 @@
                <h3> Latest posts </h3>
                {% show_latest_posts 3 %}
                <h4> Current time </h4>
-               {% time %}          
+               {% time_now %}          
           </div>
      ~~~
 
@@ -1605,3 +1605,24 @@
      <img src = "RSS_feed.png" width = "50%"/>
 
      - the link shows the `RSS feed` as shown above
+
+#### Adding full-text search
+
+1) Install `PostgreSQL`
+   
+     - The `PostgreSQL` database allows for much more complex search queries than the native `SQLite`
+
+     - <a href = "https://www.postgresql.org/docs/12/textsearch.html"> PostgreSQL full-text search </a>
+
+     - the `psycopg2 PostgreSQL adapter` must be also installed
+     - The binary package is a practical choice for development and testing but in production it is advised to use the package built from sources.
+
+     ~~~ bash
+     pip install psycopg2-binary
+     ~~~
+
+2) Create a user for the PostgreSQL database
+
+~~~ bash
+
+~~~

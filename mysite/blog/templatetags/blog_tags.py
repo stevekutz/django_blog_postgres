@@ -16,7 +16,7 @@ format_string = "%b %x %X %Z %p"
 def total_posts():
     return Post.published.count()
 
-@register.simple_tag(name = 'time')
+@register.simple_tag(name = 'time_now')
 def show_current_time():
      return datetime.datetime.now().strftime(format_string)
 
