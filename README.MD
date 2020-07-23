@@ -1487,3 +1487,121 @@
           </url>
      </urlset>
      ~~~
+
+#### Creating feeds
+
+1) Create `feeds.py` inside the `blog` app folder
+
+     - `Django` can be  configured to create `RSS` or `Atom` feeds for updated content
+     - the feeds are usually generated in `XML` format by a `feed aggregator`
+     - <a href = "https://docs.djangoproject.com/en/3.0/ref/contrib/syndication/"> Django Syndication Feed framework </a>
+     - the `reverse()` method allows for URLs to be created from their `name` and other optional params
+     - `items()` retrieves objects to be used in the feed
+
+     ~~~ py
+     from django.contrib.syndication.views import Feed
+     from django.template.defaultfilters import truncatewords
+     from django.urls import reverse_lazy
+     from .models import Post
+
+     class LatestPostsFeed(Feed):
+          title = 'My Blog'
+          link = reverse_lazy('blog:post_list')
+          description = 'New posts of my own'
+
+          def items(self):
+               return Post.published.all()[:5]
+
+          def item_title(self, item):
+               return item.title  
+
+          def item_description(self, item):
+               return truncatewords(item.body, 30)   
+     ~~~
+
+2) Modify the `blog` app's `urls.py` file
+
+     - include the import
+
+     ~~~ py
+     from .feeds import LatestPostsFeed
+     ~~~
+
+     - add the feed route to `urlpatterns`
+
+     ~~~ py
+     urlpatterns = [
+     # post views
+     path('', views.post_list, name = 'post_list'),
+     # path('', views.PostListView.as_view(), name = 'post_list'),
+     path('tag/<slug:tag_slug>/', views.post_list, name = 'post_list_by_tag'),
+     path('<int:year>/<int:month>/<int:day>/<slug:post>/', views.post_detail, name = 'post_detail'),
+     path('<int:post_id>/share/', views.post_share, name = 'post_share'),
+     path('feed/', LatestPostsFeed(), name = 'post_feed'),
+     ]
+     ~~~
+
+3) Navigate to `http://127.0.0.1:8000/blog/feed/` to view the RSS feed
+
+     ~~~ RSS
+     <?xml version="1.0" encoding="utf-8"?>
+     <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+          <channel>
+               <title>My Blog</title>
+               <link>http://localhost:8000/blog/</link>
+               <description>New posts of my own</description>
+               <atom:link href="http://localhost:8000/blog/feed/" rel="self"></atom:link>
+               <language>en-us</language>
+               <lastBuildDate>Thu, 23 Jul 2020 02:13:27 +0000</lastBuildDate>
+               <item>
+                    <title>Markdown post</title>
+                    <link>http://localhost:8000/blog/2020/7/22/markdown-post/</link>
+                    <description>This is a post formatted with markdown -------------------------------------- *this is emphasized* **this is more emphasized** Here is a new list: * one * two * three</description>
+                    <guid>http://localhost:8000/blog/2020/7/22/markdown-post/</guid>
+               </item>
+               <item
+                    ><title>The new published post</title>
+                    <link>http://localhost:8000/blog/2020/5/22/new-published-post/</link>
+                    <description>Something in the new published post</description>
+                    <guid>http://localhost:8000/blog/2020/5/22/new-published-post/</guid>
+               </item>
+               <item>
+                    <title>Miles Davis favorite songs</title>
+                    <link>http://localhost:8000/blog/2020/5/22/miles-davis-favorite-songs/</link>
+                    <description>Miles Davis III was an American jazz pianist, bandleader, and composer</description>
+                    <guid>http://localhost:8000/blog/2020/5/22/miles-davis-favorite-songs/</guid>
+               </item>
+               <item>
+                    <title>Notes on Duke Ellington</title>
+                    <link>http://localhost:8000/blog/2020/5/22/notes-duke-ellington/</link>
+                    <description>Edward "Kennedy" Ellington was an American composer, pianist, and leader of a jazz orchestra</description>
+                    <guid>http://localhost:8000/blog/2020/5/22/notes-duke-ellington/</guid>
+               </item>
+               <item>
+                    <title>Another-post</title>
+                    <link>http://localhost:8000/blog/2020/5/20/another-post/</link>
+                    <description>Post body.</description>
+                    <guid>http://localhost:8000/blog/2020/5/20/another-post/</guid>
+               </item>
+          </channel>
+     </rss>
+     ~~~
+
+4) Add a `feed subscription` to the `sidebar` in `base.html`
+
+     ~~~ html
+          <ul>
+               {% for post in most_commented_posts %}
+                    <li>
+                         <a href = "{{post.get_absolute_url}}"> {{post.title}} </a>
+                    </li>
+               {% endfor %}     
+          </ul>
+          <p>
+               <a href = "{% url 'blog:post_feed' %}"> Subscribe to the RSS feed </a>
+          </p>
+     ~~~
+
+     <img src = "RSS_feed.png" width = "50%"/>
+
+     - the link shows the `RSS feed` as shown above
