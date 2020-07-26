@@ -6,26 +6,26 @@
     python3 -m venv my_env
     ~~~
 
-3) Activate virtual environment
+2) Activate virtual environment
 
     ~~~ bash
     source my_env/bin/activate
     ~~~
 
-4) Install Django
+3) Install Django
 
     ~~~ bash
     pip install Django
     ~~~
 
 
-5) Create `mysite` project
+4) Create `mysite` project
 
     ~~~ bash
     django-admin startproject mysite
     ~~~
 
-6) Run migration to setup tables for applications
+5) Run migration to setup tables for applications
 
     - NOTE: you must change directory to the project folder before running migration
 
@@ -38,7 +38,7 @@
 
         <img src = "First_Migration_.png"/> 
 
-7) Run the Django development server to verify installation
+6) Run the Django development server to verify installation
 
     ~~~ bash
     python manage.py runserver
@@ -1623,6 +1623,5 @@
 
 2) Create a user for the PostgreSQL database
 
-~~~ bash
-
+~~~ bashREADME
 ~~~
