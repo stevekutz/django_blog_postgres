@@ -2,15 +2,29 @@
 
 1) Create environment
 
-    ~~~ bash
-    python3 -m venv my_env
-    ~~~
+     ~~~ bash
+     python3 -m venv my_env
+     ~~~
+
+     - if Python 3.7 needed
+
+     ~~~ bash
+     python3.7 -m venv ~/venv/py3.7
+     ~~~
+
+
 
 2) Activate virtual environment
 
-    ~~~ bash
-    source my_env/bin/activate
-    ~~~
+     ~~~ bash
+     source my_env/bin/activate
+     ~~~
+
+     - if Python 3.7 venv created
+
+     ~~~ bash
+     source ~/venv/py3.7/bin/activate
+     ~~~
 
 3) Install Django
 
@@ -1621,7 +1635,42 @@
      pip install psycopg2-binary
      ~~~
 
-2) Create a user for the PostgreSQL database
+2) Create a user and enter a password 
 
-~~~ bashREADME
-~~~
+     ~~~ bash
+     createuser -dP blog
+     ~~~
+
+3) Create the `blog` database
+
+     ~~~ bash
+     createdb -E utf8 -U blog blog
+     ~~~
+
+4) Update the `DATABASES` section of `settings.py`
+
+     ~~~ py
+     DATABASES = {
+          'default': {
+               'ENGINE': 'django.db.backends.postgresql',
+               'NAME': 'blog',
+               'USER': 'blog',
+               'PASSWORD': 'blog',
+
+          }
+     }
+     ~~~
+
+5) Run a migration. Note that the database will be empty
+
+     ~~~ bash
+     python manage.py migrate
+     ~~~
+
+6) Create a superuser
+
+     ~~~ bash
+     python manage.py createsuperuser
+     ~~~
+
+7) Add several posts with tags, etc. to start experimenting with searching with `Postgres`
