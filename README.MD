@@ -1049,7 +1049,7 @@
 
 #### Using custom template tags
 
-<a href = "https://docs.djangoproject.com/en/3.0/howto/custom-template-tags/"> Django Cusomter template tags documentation </a>
+<a href = "https://docs.djangoproject.com/en/3.0/howto/custom-template-tags/"> Django Custom template tags documentation </a>
 
 1) Create a `templatetags` directory inside the `blog` app
 
@@ -1699,6 +1699,11 @@
      Post.objects.filter(body__search='searched')
      ~~~
 
+     ~~~ bash
+     from blog.models import Post
+     Post.objects.filter(body__icontains='searched')
+     ~~~
+
      - to search in multiple fields, use the `SearchVector` object
      - both the `title` and `body` text will be searched
 
@@ -1710,3 +1715,106 @@
      search=SearchVector('title', 'body'),
      ).filter(search='post')
      ~~~ 
+
+#### Create Searchable View
+
+1) Create a search form in `forms.py`
+
+     - the `query` object will allow users to enter search terms
+
+     ~~~ py
+     class SearchForm(forms.Form):
+          query = forms.CharField()
+     ~~~
+
+2) Create a `post_search` view in `views.py`
+
+     - <a href = "https://docs.djangoproject.com/en/3.0/ref/contrib/postgres/search/#searchvector"> Django SearchVector ref </a>
+
+
+     - the following imports are required
+
+     ~~~ py
+     from django.contrib.postgres.search import SearchVector
+     from .forms import EmailPostForm, CommentForm, SearchForm
+     ~~~
+
+     - `form` instantiates the `SearchForm` form
+     - `request.GET` verifies if a form was submitted
+     - the form is sent using `GET` so that the URL includes the `query` parameter
+     - `search` instantiates `SearchVector` using the customized `title` and `body` field entries
+
+     ~~~ py
+          def post_search(request):
+               form = SearchForm()
+               query = None
+               results = []
+
+               if 'query' in request.GET:
+               form = SearchForm(request.GET)
+               if form.is_valid():
+                    query = form.cleaned_data['query']
+                    results = Post.published.annotate(search=SearchVector('title', 'body'),).filter(search=query)
+               
+               context = {
+                    'form': form,
+                    'query': query,
+                    'results': results
+               }
+               
+               return render(request, 'blog/post/search.html', context)
+     ~~~
+
+
+
+3) Create the `search.html` template within the `/blog/templates/blog/post/` folder
+
+     ~~~ py
+     {% extends "blog/base.html" %}
+     {% load blog_tags %}
+
+     {% block title %} Search {% endblock %}
+
+     {% block content%}
+          {% if query %}
+
+               <h1> Posts containing "{{query}}" </h1>
+               <h3>
+                    {% with results.count as total_results %}
+                    Found {{ total_results }} result {{ total_results|pluralize }}
+                    {% endwith %}
+               </h3>
+
+               {% for post in results %}
+                    <h4>
+                         <a href = "{{ post.get_absolute_url }}"> {{ post.title }} </a>
+                    </h4>
+
+                    {{ post.body|markdown|truncatewords_html:5 }}
+
+                    {%  empty %}
+                    <p> There are no results for your query </p>
+               {% endfor %} 
+
+               <p>
+                    <a href = "{% url "blog:post_search" %}"> Search again </a>
+               </p>
+
+          {% else %}
+               <h1> Search for posts </h1>
+
+               <form method = "get">
+                    {{ form.as_p }}
+                    <input type = "submit" value = "Search" />
+               </form>
+
+          {% endif %}
+
+     {% endblock %}
+     ~~~
+
+4) Add path to `search.html` inside the app's `urls.py` file
+
+~~~ py
+
+~~~
