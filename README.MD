@@ -1674,3 +1674,39 @@
      ~~~
 
 7) Add several posts with tags, etc. to start experimenting with searching with `Postgres`
+
+##### Simple searches
+
+1) Add to `INSTALLED_APPS` in `settings.py`
+
+     ~~~ py
+     INSTALLED_APPS = [
+          'django.contrib.postres',
+          'django.contrib.sites',
+          'django.contrib.sitemaps',
+     ~~~
+
+2) Test some simple looks ups using `QuerySet`
+
+     ~~~ bash
+     python manage.py shell
+     ~~~
+
+     - the following will search `body` text for the word `postgres`
+
+     ~~~ bash
+     from blog.models import Post
+     Post.objects.filter(body__search='searched')
+     ~~~
+
+     - to search in multiple fields, use the `SearchVector` object
+     - both the `title` and `body` text will be searched
+
+     ~~~ bash
+     from django.contrib.postgres.search import SearchVector
+     from blog.models import Post
+
+     Post.objects.annotate(
+     search=SearchVector('title', 'body'),
+     ).filter(search='post')
+     ~~~ 
