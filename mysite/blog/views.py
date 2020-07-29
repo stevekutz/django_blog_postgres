@@ -128,9 +128,9 @@ def post_search(request):
           if form.is_valid():
                query = form.cleaned_data['query']
                # results = Post.published.annotate(search=SearchVector('title', 'body'),).filter(search=query).order_by('-updated')
-               search_vector = SearchVector('title', 'body')
+               search_vector = SearchVector('title', weight = 'A') +  SearchVector('body', weight = 'B')
                search_query = SearchQuery(query)
-               results = Post.published.annotate(search=search_vector, rank = SearchRank(search_vector, search_query)).filter(search=search_query).order_by('-rank')
+               results = Post.published.annotate(search=search_vector, rank = SearchRank(search_vector, search_query)).filter(rank__gte = 0.3).order_by('-rank')
 
      context = {
           'form': form,
