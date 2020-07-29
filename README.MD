@@ -1881,3 +1881,34 @@ If you are using Python 3.8, you may receive an error when attempting to run a m
      ~~~ py
      results = Post.published.annotate(search=search_vector, rank = SearchRank(search_vector, search_query)).filter(rank__gte = 0.3).order_by('-rank')
      ~~~
+
+#### Using trigram similarity
+
+1) A `trigram` is simply three consecutive characters. String similarity can be measured by counting the number of trigrams the strings share
+
+     - in terminal, open `psql blog`
+
+     ~~~ bash
+     psql blog
+     ~~~
+
+     - install the `pg_trgm` extension
+
+     ~~~ bash
+     CREATE EXTENSION pg_trgm;
+     ~~~
+
+     - enter `\q` to quit the `psql` command line
+
+2) Add the import for `Trigram Similarity` to the blog app's `views.py` file
+
+     ~~~ bash
+     from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
+     ~~~
+
+
+3) Modify the `results` variable
+
+     ~~~ bash
+     results = Post.published.annotate(similarity = TrigramSimilarity('title', query),).filter(similarity__gt=0.1).order_by('-similarity')
+     ~~~
