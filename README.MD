@@ -1869,3 +1869,15 @@ If you are using Python 3.8, you may receive an error when attempting to run a m
 
      - `SearchRank` orders the results by relevancy
      - `SearchVector` builds a query from searches in the `title` and `body` fields
+
+#### Weighing Serch queries
+
+1) Specific fields can be given a higher priority by weighing them differently. Search vectors can be combined as well as including specific weights for each
+
+
+     - the following letters have corresponding weights: `A` weighs `1.0`, `B` weighs `0.4`, `C` weighs `0.2`, `D` weighs `0.1`  
+     - `gte` represents `greater tahn or equal to`
+
+     ~~~ py
+     results = Post.published.annotate(search=search_vector, rank = SearchRank(search_vector, search_query)).filter(rank__gte = 0.3).order_by('-rank')
+     ~~~
