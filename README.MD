@@ -1898,6 +1898,18 @@ If you are using Python 3.8, you may receive an error when attempting to run a m
      CREATE EXTENSION pg_trgm;
      ~~~
 
+     - verify that the extension is installed by entering `\dx` while in the psql shell
+
+     - the following is expected
+
+     ~~~bash
+                                        List of installed extensions
+     Name   | Version |   Schema   |                            Description                            
+     ---------+---------+------------+-------------------------------------------------------------------
+     pg_trgm | 1.4     | public     | text similarity measurement and index searching based on trigrams
+     plpgsql | 1.0     | pg_catalog | PL/pgSQL procedural language
+     ~~~
+
      - enter `\q` to quit the `psql` command line
 
 2) Add the import for `Trigram Similarity` to the blog app's `views.py` file
