@@ -35,6 +35,14 @@
                <p>
                     <a href = "{% url 'blog:post_feed' %}"> Subscribe to the RSS feed </a>
                </p>
+
+               <p> Current URL {{ request.get_full_path }}</p>
+               
+               {% if request.get_full_path != '/blog/search/'%}     
+                    <p>
+                         <a href = "{% url 'blog:post_search' %}"> Search Posts </a>
+                    </p>
+               {% endif %}
           </div>
 
     </body>
