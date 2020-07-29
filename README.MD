@@ -1842,3 +1842,30 @@ If you are using Python 3.8, you may receive an error when attempting to run a m
           </p>
      {% endif %}
      ~~~
+
+#### Stemming and Ranking Search Results
+
+1) Add the following imports to blog app's `views.py` file
+
+     ~~~ py
+     from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+     ~~~
+
+
+     - Stemming is used in search enginers to reduce words to their stem, e.g. post is the stem of posted, posting, etc.
+
+     - `PostgreSQL` uses stemming algorithms to refine searches and can also count the frequency of search terms
+
+2) In the `post_search` view, comment out the previous `results` variable and replace with the following:
+
+
+     ~~~ py
+     # results = Post.published.annotate(search=SearchVector('title', 'body'),).filter(search=query).order_by('-updated')
+                    search_vector = SearchVector('title', 'body')
+                    search_query = SearchQuery(query)
+                    results = Post.published.annotate(search=search_vector, rank = SearchRank(search_vector, search_query)).filter(search=search_query).order_by('-rank')
+
+     ~~~
+
+     - `SearchRank` orders the results by relevancy
+     - `SearchVector` builds a query from searches in the `title` and `body` fields
